@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCQ Generate Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primary: #2c3e50; --accent: #3498db; --bg: #f0f2f5; --blue-sidebar: #049ff2; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; background: var(--bg); overflow-x: hidden; }
+        
+        .page { display: none; min-height: 100vh; flex-direction: column; align-items: center; padding: 20px; box-sizing: border-box; }
+        .active { display: flex; }
+        .container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
+        
+        h1 { font-size: 20px; color: var(--primary); margin-bottom: 20px; text-align: center; }
+        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        
+        button { width: 100%; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 10px; transition: 0.3s; }
+        .btn-blue { background: var(--accent); color: white; }
+        .btn-light { background: #e0e0e0; color: #333; }
+        
+        .footer { margin-top: auto; padding: 15px; font-size: 13px; text-align: center; color: #555; }
+        .footer b { color: black; font-weight: bold; }
+
+        /* Blue Sidebar */
+        .sidebar { position: fixed; left: -260px; top: 0; width: 250px; height: 100%; background: var(--blue-sidebar); color: white; box-shadow: 2px 0 10px rgba(0,0,0,0.2); transition: 0.3s; z-index: 1000; padding-top: 20px; }
+        .sidebar.open { left: 0; }
+        .sidebar h2 { font-size: 18px; text-align: center; margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 15px; }
+        .sidebar-item { padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); cursor: pointer; display: flex; align-items: center; transition: 0.2s; }
+        .sidebar-item:hover { background: rgba(255,255,255,0.1); }
+        .sidebar-item i { margin-right: 15px; width: 20px; }
+
+        .menu-icon { position: absolute; top: 20px; left: 20px; font-size: 24px; cursor: pointer; z-index: 900; color: var(--primary); }
+        .home-icon { position: absolute; top: 20px; right: 20px; font-size: 24px; cursor: pointer; color: var(--accent); }
+
+        .profile-circle { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--accent); margin: 0 auto 15px; position: relative; background: #eee; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .profile-circle img { width: 100%; height: 100%; object-fit: cover; }
+
+        .mcq-item { background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid var(--accent); text-align: left; }
+        
+        /* Fixed Print Layout */
+        #printArea { background: white; padding: 30px; width: 100%; max-width: 800px; display: none; margin-top: 20px; border: 1px solid #ddd; box-sizing: border-box; }
+        .print-header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid black; padding-bottom: 10px; }
+        
+        @media print {
+            body * { visibility: hidden; }
+            #printArea, #printArea * { visibility: visible; }
+            #printArea { position: absolute; left: 0; top: 0; width: 100%; display: block; border: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="page-entry" class="page active">
+        <h1>MCQ generate Portal</h1>
+        <div class="container">
+            <button class="btn-blue" onclick="nav('page-signup')">Sign up</button>
+            <button class="btn-light" onclick="nav('page-login')">Log In</button>
+        </div>
+        <div class="footer">©2026 MCQ Portal. Develop By <b>ASIF</b></div>
+    </div>
+
+    <div id="page-signup" class="page">
+        <h1>MCQ generate Portal</h1>
+        <div class="container">
+            <input type="text" id="regName" placeholder="Enter the Student Name">
+            <input type="text" id="regClass" placeholder="Enter the class">
+            <input type="password" id="regPass" placeholder="Enter the Password">
+            <input type="password" id="regConfirm" placeholder="Enter the Confirm Password">
+            <button class="btn-blue" onclick="handleSignup()">Sign up</button>
+        </div>
+        <div class="footer">©2026 MCQ Portal. Develop By <b>ASIF</b></div>
+    </div>
+
+    <div id="page-captcha" class="page">
+        <h1>MCQ generate Portal</h1>
+        <div class="container">
+            <div style="background: #eee; padding: 10px; margin-bottom: 10px; font-weight: bold; letter-spacing: 5px;" id="captchaCode">M89X2</div>
+            <input type="text" id="captchaInput" placeholder="Enter the Captcha Code">
+            <button class="btn-blue" onclick="verifyCaptcha()">Verified</button>
+        </div>
+        <div class="footer">©2026 MCQ Portal. Develop By <b>ASIF</b></div>
+    </div>
+
+    <div id="page-login" class="page">
+        <h1>MCQ generate Portal</h1>
+        <div class="container">
+            <input type="text" id="logName" placeholder="Enter The Student Name">
+            <input type="password" id="logPass" placeholder="Enter the Password">
+            <button class="btn-blue" onclick="handleLogin()">Login Button</button>
+        </div>
+        <div class="footer">©2026 MCQ Portal. Develop By <b>ASIF</b></div>
+    </div>
+
+    <div id="page-dashboard" class="page">
+        <div class="menu-icon" onclick="toggleMenu()"><i class="fas fa-bars"></i></div>
+        <h1>MCQ generate Portal</h1>
+        <div class="container" style="padding:40px 20px;">
+            <div class="profile-circle">
+                <i class="fas fa-user" style="font-size: 40px; color: #ccc;"></i>
+                <img id="displayImg" style="display:none; position:absolute;">
+            </div>
+            <h3 id="userNameDisplay">Student Name</h3>
+            <p id="userClassDisplay" style="color: #666;">Class: -</p>
+        </div>
+        <div class="footer">©2026 MCQ Portal. Develop By <b>ASIF</b></div>
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <h2>MCQ generate Portal</h2>
+        <div class="sidebar-item" onclick="nav('page-add-mcq')"><i class="fas fa-plus"></i> MCQ Question Add</div>
+        <div class="sidebar-item" onclick="nav('page-generate')"><i class="fas fa-cog"></i> MCQ generate</div>
+        <div class="sidebar-item" onclick="nav('page-info')"><i class="fas fa-user-edit"></i> Student information</div>
+        <div class="sidebar-item" onclick="handleLogout()" style="margin-top:20px; color:#ff7675;"><i class="fas fa-sign-out-alt"></i> Logout</div>
+        <div class="footer" style="position:absolute; bottom:10px; color:white; width:100%;">©2026 MCQ Portal. Develop By <b>ASIF</b></div>
+    </div>
+
+    <div id="page-info" class="page">
+        <div class="home-icon" onclick="nav('page-dashboard')"><i class="fas fa-house"></i></div>
+        <h1>MCQ generate Portal</h1>
+        <div class="container">
+            <h3>Edit Information</h3>
+            <input type="text" id="editName" placeholder="Update Student Name">
+            <input type="text" id="editClass" placeholder="Update Class">
+            <button class="btn-blue" onclick="updateInfo()">Student Information Update</button>
+        </div>
+        <div class="footer">©2026 MCQ Portal. Develop By <b>ASIF</b></div>
+    </div>
+
+    <div id="page-add-mcq" class="page">
+        <div class="home-icon" onclick="nav('page-dashboard')"><i class="fas fa-house"></i></div>
+        <h1>MCQ generate Portal</h1>
+        <div class="container" style="max-width: 500px;">
+            <input type="text" id="examName" placeholder="Enter the Exam Name">
+            <input type="text" id="chapterName" placeholder="Enter the Chapter Name">
+            <input type="text" id="subjectName" placeholder="Enter the subject name">
+            <div id="mcqList"></div>
+            <button class="btn-light" onclick="addMcqRow()">+ Add MCQ Box</button>
+            <button class="btn-blue" onclick="saveMcqToDb()">MCQ Add</button>
+        </div>
+        <div class="footer">©2026 MCQ Portal. Develop By <b>ASIF</b></div>
+    </div>
+
+    <div id="page-generate" class="page">
+        <div class="home-icon" onclick="nav('page-dashboard')"><i class="fas fa-house"></i></div>
+        <h1>MCQ generate Portal</h1>
+        <div class="container">
+            <select id="selExam"><option>Select Exam Name</option></select>
+            <select id="selSub"><option>Select Subject Name</option></select>
+            <select id="selChap"><option>Select Chapter Name</option></select>
+            <button class="btn-blue" onclick="generateNow()">MCQ generate</button>
+        </div>
+
+        <div id="printArea">
+            <div class="print-header">
+                <h2 id="pExam"></h2>
+                <div style="display:flex; justify-content:space-between; font-weight:bold;">
+                    <span id="pSub"></span>
+                    <span id="pChap"></span>
+                </div>
+            </div>
+            <div id="qContainer"></div>
+            <button class="btn-blue" onclick="window.print()" style="margin-top:20px;">Download / Print PDF</button>
+        </div>
+        <div class="footer">©2026 MCQ Portal. Develop By <b>ASIF</b></div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getDatabase, ref, set, push, onValue, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDqVkchrTypEPiIYumOyr0oCRW1Q4ro3fY",
+            authDomain: "mcq-generate-portal.firebaseapp.com",
+            databaseURL: "https://mcq-generate-portal-default-rtdb.firebaseio.com",
+            projectId: "mcq-generate-portal",
+            storageBucket: "mcq-generate-portal.firebasestorage.app",
+            messagingSenderId: "83255774683",
+            appId: "1:83255774683:web:3c1f12548eab2389c36bfe"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        window.nav = (id) => {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('printArea').style.display = 'none';
+        };
+
+        window.toggleMenu = () => document.getElementById('sidebar').classList.toggle('open');
+
+        // Authentication & Profile
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                nav('page-dashboard');
+                onValue(ref(db, `users/${user.uid}/profile`), (s) => {
+                    if(s.exists()){
+                        const d = s.val();
+                        document.getElementById('userNameDisplay').innerText = d.name;
+                        document.getElementById('userClassDisplay').innerText = "Class: " + d.class;
+                        document.getElementById('editName').value = d.name;
+                        document.getElementById('editClass').value = d.class;
+                    }
+                });
+                loadDropdowns(user.uid);
+            } else { nav('page-entry'); }
+        });
+
+        window.handleSignup = () => {
+            const name = document.getElementById('regName').value;
+            const cls = document.getElementById('regClass').value;
+            const pass = document.getElementById('regPass').value;
+            if(pass !== document.getElementById('regConfirm').value) return alert("পাসওয়ার্ড মিলছে না");
+            
+            const email = name.replace(/\s/g, '').toLowerCase() + "@mcq.com";
+            createUserWithEmailAndPassword(auth, email, pass).then(r => {
+                set(ref(db, `users/${r.user.uid}/profile`), { name, class: cls });
+                nav('page-captcha');
+            }).catch(e => alert(e.message));
+        };
+
+        window.verifyCaptcha = () => nav('page-dashboard');
+        window.handleLogin = () => {
+            const email = document.getElementById('logName').value.replace(/\s/g, '').toLowerCase() + "@mcq.com";
+            signInWithEmailAndPassword(auth, email, document.getElementById('logPass').value).catch(e => alert("ভুল তথ্য!"));
+        };
+        window.handleLogout = () => signOut(auth);
+
+        // Update Info
+        window.updateInfo = () => {
+            const user = auth.currentUser;
+            update(ref(db, `users/${user.uid}/profile`), {
+                name: document.getElementById('editName').value,
+                class: document.getElementById('editClass').value
+            }).then(() => alert("তথ্য আপডেট হয়েছে!"));
+        };
+
+        // MCQ Logic
+        window.addMcqRow = () => {
+            const sub = document.getElementById('subjectName').value.toLowerCase();
+            const labels = (sub.includes('eng')) ? ['a','b','c','d'] : ['ক','খ','গ','ঘ'];
+            const div = document.createElement('div');
+            div.className = 'mcq-item';
+            div.innerHTML = `<input type="text" class="q-title" placeholder="Question">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px;">
+                    <input type="text" class="opt" placeholder="${labels[0]}"> <input type="text" class="opt" placeholder="${labels[1]}">
+                    <input type="text" class="opt" placeholder="${labels[2]}"> <input type="text" class="opt" placeholder="${labels[3]}">
+                </div>`;
+            document.getElementById('mcqList').appendChild(div);
+        };
+
+        window.saveMcqToDb = () => {
+            const data = {
+                examName: document.getElementById('examName').value,
+                chapterName: document.getElementById('chapterName').value,
+                subjectName: document.getElementById('subjectName').value,
+                questions: []
+            };
+            document.querySelectorAll('.mcq-item').forEach(i => {
+                data.questions.push({ q: i.querySelector('.q-title').value, opts: Array.from(i.querySelectorAll('.opt')).map(o => o.value) });
+            });
+            push(ref(db, `users/${auth.currentUser.uid}/mcqs`), data).then(() => { alert("Saved!"); nav('page-dashboard'); });
+        };
+
+        function loadDropdowns(uid) {
+            onValue(ref(db, `users/${uid}/mcqs`), (snap) => {
+                const ex = document.getElementById('selExam'), su = document.getElementById('selSub'), ch = document.getElementById('selChap');
+                ex.innerHTML = '<option>Select Exam Name</option>';
+                su.innerHTML = '<option>Select Subject Name</option>';
+                ch.innerHTML = '<option>Select Chapter Name</option>';
+                snap.forEach(c => {
+                    const d = c.val();
+                    ex.innerHTML += `<option value="${c.key}">${d.examName}</option>`;
+                    su.innerHTML += `<option value="${c.key}">${d.subjectName}</option>`;
+                    ch.innerHTML += `<option value="${c.key}">${d.chapterName}</option>`;
+                });
+            });
+        }
+
+        window.generateNow = () => {
+            const id = document.getElementById('selExam').value;
+            onValue(ref(db, `users/${auth.currentUser.uid}/mcqs/${id}`), (s) => {
+                const d = s.val();
+                document.getElementById('pExam').innerText = d.examName;
+                document.getElementById('pSub').innerText = "Subject: " + d.subjectName;
+                document.getElementById('pChap').innerText = "Chapter: " + d.chapterName;
+                const container = document.getElementById('qContainer');
+                container.innerHTML = '';
+                d.questions.forEach((q, i) => {
+                    container.innerHTML += `<div style="margin-bottom:15px"><b>${i+1}. ${q.q}</b>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; margin-left:20px;">
+                            <span>(ক) ${q.opts[0]}</span><span>(খ) ${q.opts[1]}</span>
+                            <span>(গ) ${q.opts[2]}</span><span>(ঘ) ${q.opts[3]}</span>
+                        </div></div>`;
+                });
+                document.getElementById('printArea').style.display = 'block';
+            });
+        };
+    </script>
+</body>
+</html>
